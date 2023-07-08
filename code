@@ -1,0 +1,123 @@
+#define BLYNK_TEMPLATE_ID ""
+#define BLYNK_TEMPLATE_NAME ""
+#define BLYNK_AUTH_TOKEN ""
+#define BLYNK_PRINT Serial
+
+#include <Wire.h>
+#include <DHT.h>
+#include "MAX30100_PulseOximeter.h"
+#include <BlynkSimpleEsp32.h>
+#include <WiFi.h>
+#include <WiFiClient.h>
+
+char auth[] = BLYNK_AUTH_TOKEN;
+char ssid[] = "";
+char pass[] = "";
+
+#define DHTPIN 5
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+PulseOximeter pox;
+float BPM, SpO2;
+uint32_t tsLastReport = 0;
+
+BlynkTimer timer;
+
+#define REPORTING_PERIOD_MS 1000
+
+#define MQ2 34
+int MQ2_Val = 0;
+
+void mySensor()
+{
+  MQ2_Val = analogRead(MQ2);
+  for(int x = 0 ; x < 100 ; x++)
+    {
+        MQ2_Val = MQ2_Val + analogRead(MQ2);
+    }
+    MQ2_Val = MQ2_Val/100.0;
+  
+  Blynk.virtualWrite(V5, MQ2_Val);
+    Serial.print("MQ2 Level: ");
+  Serial.println(MQ2_Val);
+
+}
+
+void sendSensor()
+{
+    float h = dht.readHumidity();
+    float t = dht.readTemperature();
+
+    if (isnan(h) || isnan(t))
+    {
+        Serial.println("Failed to read from DHT sensor!");
+        return;
+    }
+
+    Blynk.virtualWrite(V1, t);
+    Blynk.virtualWrite(V2, h);
+    Serial.print("Temperature : ");
+    Serial.print(t);
+    Serial.print("    Humidity : ");
+    Serial.println(h);
+}
+
+void onBeatDetected()
+{
+    Serial.println("Beat Detected!");
+}
+
+void setup()
+{
+    Serial.begin(115200);
+
+    Blynk.begin(auth, ssid, pass);
+    dht.begin();
+    timer.setInterval(1000L, mySensor);
+    timer.setInterval(5000L, sendSensor);
+    
+    pinMode(19, OUTPUT);
+
+    Serial.print("Initializing Pulse Oximeter..");
+
+    if (!pox.begin())
+    {
+        Serial.println("FAILED");
+        for (;;)
+        {
+        }
+    }
+    else
+    {
+        Serial.println("SUCCESS");
+        pox.setOnBeatDetectedCallback(onBeatDetected);
+    }
+
+    pox.setIRLedCurrent(MAX30100_LED_CURR_7_6MA);
+}
+
+void loop()
+{
+    Blynk.run();
+    timer.run();
+
+    pox.update();
+
+    BPM = pox.getHeartRate();
+    SpO2 = pox.getSpO2();
+
+    if (millis() - tsLastReport > REPORTING_PERIOD_MS)
+    {
+        Serial.print("Heart rate:");
+        Serial.print(BPM);
+        Serial.print(" bpm / SpO2:");
+        Serial.print(SpO2);
+        Serial.println(" %");
+
+        Blynk.virtualWrite(V3, BPM);
+        Blynk.virtualWrite(V4, SpO2);
+
+        tsLastReport = millis();
+    }
+}
