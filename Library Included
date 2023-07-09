@@ -1,0 +1,7 @@
+Libraray Included in the Projects :
+# "Wire.h"
+# "DHT.h"
+# "MAX30100_PulseOximeter.h"
+# "BlynkSimpleEsp32.h"
+# "WiFi.h"
+# "WiFiClient.h"
