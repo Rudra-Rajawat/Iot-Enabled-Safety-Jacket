@@ -74,6 +74,6 @@ We would like to express our gratitude to the developers of the libraries and fr
 
 ## Contact
 
-If you have any questions or inquiries about this project, please contact us at [your-email@example.com](mailto:RUDRARAJAWAT001@gmail.com).
+If you have any questions or inquiries about this project, please contact us at [RUDRARAJAWAT001@gmail.com](mailto:RUDRARAJAWAT001@gmail.com).
 
 Happy hacking!
