@@ -1,6 +1,6 @@
 #define BLYNK_TEMPLATE_ID ""
-#define BLYNK_TEMPLATE_NAME ""
-#define BLYNK_AUTH_TOKEN ""
+#define BLYNK_TEMPLATE_NAME "Your blynk template name"
+#define BLYNK_AUTH_TOKEN " your blynk token "
 #define BLYNK_PRINT Serial
 
 #include <Wire.h>
@@ -11,8 +11,8 @@
 #include <WiFiClient.h>
 
 char auth[] = BLYNK_AUTH_TOKEN;
-char ssid[] = "";
-char pass[] = "";
+char ssid[] = "Your Wifi SSID";
+char pass[] = "Your Wifi Password";
 
 #define DHTPIN 5
 #define DHTTYPE DHT11
